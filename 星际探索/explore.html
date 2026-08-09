@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>探索太阳系 — 星际探索</title>
+  <meta name="description" content="深入了解太阳系，探索八大行星的奥秘">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== 探索页样式 ===== */
+
+    /* --- 行星 Tab --- */
+    .explore-tabs {
+      max-width: 1000px;
+      margin: 0 auto 40px;
+    }
+    .explore-panel {
+      display: none;
+    }
+    .explore-panel.active {
+      display: block;
+    }
+    .explore-panel p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.8;
+      margin-bottom: 16px;
+    }
+
+    /* --- 行星卡片网格 --- */
+    .planet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-top: 20px;
+    }
+    .planet-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .planet-card:hover {
+      box-shadow: var(--shadow-glow);
+      border-color: rgba(0, 212, 255, 0.3);
+    }
+    .planet-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+    .planet-card-body {
+      padding: 16px 18px 20px;
+    }
+    .planet-card-body h3 {
+      font-size: 1.1rem;
+      margin-bottom: 4px;
+    }
+    .planet-card-body .planet-en {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .planet-card-body p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+    .planet-card-body .planet-stat {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 2px 12px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+      background: var(--accent-cyan-dim);
+      color: var(--accent-cyan);
+    }
+
+    /* --- 视频区 --- */
+    .video-section {
+      margin-top: 50px;
+      padding: 40px 0;
+      border-top: 1px solid var(--glass-border);
+    }
+    .video-wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: #000;
+      position: relative;
+    }
+    .video-wrapper video {
+      width: 100%;
+      display: block;
+      max-height: 450px;
+      background: #000;
+    }
+    .video-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.7);
+      flex-wrap: wrap;
+    }
+    .video-controls button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: var(--transition);
+    }
+    .video-controls button:hover {
+      background: rgba(255,255,255,0.15);
+    }
+    .video-progress {
+      flex: 1;
+      min-width: 80px;
+      height: 6px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 3px;
+      cursor: pointer;
+      position: relative;
+    }
+    .video-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent-gold), var(--accent-cyan));
+      border-radius: 3px;
+      transition: width 0.1s linear;
+    }
+    .video-time {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      min-width: 100px;
+      text-align: right;
+    }
+    .video-volume {
+      width: 70px;
+      height: 4px;
+      accent-color: var(--accent-gold);
+      cursor: pointer;
+    }
+    .video-notice {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .planet-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 500px) {
+      .planet-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 页面加载动画 -->
+  <div class="page-loader" id="page-loader">
+    <span class="loader-rocket">🚀</span>
+    <div class="loader-text">加载中<span class="loader-dots"></span></div>
+  </div>
+  <!-- 阅读进度条 -->
+  <div class="reading-progress" id="reading-progress"></div>
+  <!-- 星空背景 -->
+  <div class="stars-bg"></div>
+
+  <!-- ======== 网站头部 ======== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-img">✦</div>
+        <span class="logo-text">星际<span>探索</span></span>
+      </a>
+
+      <button class="hamburger" aria-label="切换菜单">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="main-nav">
+        <li><a href="index.html">首页</a></li>
+        <li class="has-dropdown">
+          <a href="explore.html" class="active">探索 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="explore.html">太阳系</a></li>
+            <li><a href="explore.html#planets">行星</a></li>
+            <li><a href="explore.html#video">星际视频</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="gallery.html">画廊 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="gallery.html">星云</a></li>
+            <li><a href="gallery.html">星系</a></li>
+            <li><a href="gallery.html">天文摄影</a></li>
+          </ul>
+        </li>
+        <li><a href="news.html">资讯</a></li>
+        <li><a href="quiz.html">测验</a></li>
+      </ul>
+
+      <div class="quick-nav">
+        <button class="search-btn" id="search-btn" aria-label="搜索">🔍</button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">🌙</button>
+        <a href="login.html">登录</a>
+        <a href="login.html?register" class="btn-login">注册</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======== 页面横幅 ======== -->
+  <section class="page-banner">
+    <div class="container">
+      <h1>探索太阳系</h1>
+      <p>从炽热的太阳到遥远的海王星，一起遨游我们的星际家园</p>
+    </div>
+  </section>
+
+  <!-- ======== 主体 ======== -->
+  <main class="page-main">
+    <div class="container">
+
+      <!-- Tab 切换 -->
+      <div class="tabs explore-tabs">
+        <div class="tab-nav">
+          <button class="tab-btn explore-tab-btn active" data-target="panel-sun">☀️ 太阳</button>
+          <button class="tab-btn explore-tab-btn" data-target="panel-planets">🪐 行星</button>
+          <button class="tab-btn explore-tab-btn" data-target="panel-belt">☄️ 小行星带</button>
+        </div>
+
+        <!-- 面板1：太阳 -->
+        <div class="tab-panel explore-panel active" id="panel-sun">
+          <p>太阳是太阳系的中心天体，一颗黄矮星。直径约139万公里，表面温度约5500°C。太阳的能量来自核心的核聚变反应，每秒将约420万吨物质转化为能量。太阳的光和热为地球生命提供了能量源泉。</p>
+          <div class="planet-grid" id="planets">
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/01-sun-surface/01-sun-surface_02.jpg" alt="太阳" loading="lazy">
+              <div class="planet-card-body">
+                <h3>太阳</h3>
+                <div class="planet-en">Sun</div>
+                <p>直径1,392,700km · 表面温度5,505°C</p>
+                <span class="planet-stat">G2V型黄矮星</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/02-solar-flare/02-solar-flare_02.jpg" alt="太阳活动" loading="lazy">
+              <div class="planet-card-body">
+                <h3>太阳耀斑</h3>
+                <div class="planet-en">Solar Flare</div>
+                <p>太阳表面剧烈的能量爆发，可影响地球通信</p>
+                <span class="planet-stat">高能粒子流</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/03-solar-corona/03-solar-corona_01.jpg" alt="日冕" loading="lazy">
+              <div class="planet-card-body">
+                <h3>日冕</h3>
+                <div class="planet-en">Corona</div>
+                <p>太阳大气的最外层，温度可达数百万度</p>
+                <span class="planet-stat">日全食可见</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 面板2：行星 -->
+        <div class="tab-panel explore-panel" id="panel-planets">
+          <p>太阳系有八大行星，从内到外依次为：水星、金星、地球、火星、木星、土星、天王星、海王星。它们各具特色，从灼热到冰冷，从岩石到气态巨行星。</p>
+          <div class="planet-grid">
+            <div class="planet-card fade-in-up visible">
+              <img src="images/hero/02-solar-system/02-solar-system_02.jpg" alt="水星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>水星</h3>
+                <div class="planet-en">Mercury</div>
+                <p>距太阳最近，表面温差极大，白天430°C，夜晚-180°C</p>
+                <span class="planet-stat">直径4,879km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/05-venus/05-venus_01.jpg" alt="金星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>金星</h3>
+                <div class="planet-en">Venus</div>
+                <p>地球的姊妹星，浓厚的二氧化碳大气导致严重温室效应</p>
+                <span class="planet-stat">直径12,104km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/06-earth/06-earth_01.jpg" alt="地球" loading="lazy">
+              <div class="planet-card-body">
+                <h3>🌍 地球</h3>
+                <div class="planet-en">Earth</div>
+                <p>已知唯一存在生命的行星，70%被海洋覆盖</p>
+                <span class="planet-stat">直径12,742km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/07-mars/07-mars_01.jpg" alt="火星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>火星</h3>
+                <div class="planet-en">Mars</div>
+                <p>红色星球，拥有太阳系最高的山峰—奥林匹斯山</p>
+                <span class="planet-stat">直径6,779km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/08-jupiter/08-jupiter_01.jpg" alt="木星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>木星</h3>
+                <div class="planet-en">Jupiter</div>
+                <p>太阳系最大的行星，大红斑风暴持续数百年</p>
+                <span class="planet-stat">直径139,820km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/09-saturn/09-saturn_01.jpg" alt="土星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>土星</h3>
+                <div class="planet-en">Saturn</div>
+                <p>壮观的环系统，密度比水小，是太阳系密度最小的行星</p>
+                <span class="planet-stat">直径116,460km</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 面板3：小行星带 -->
+        <div class="tab-panel explore-panel" id="panel-belt">
+          <p>小行星带位于火星和木星之间，由数百万颗大小不等的小天体组成。最大的小行星是谷神星（直径约940公里），已被归类为矮行星。小行星带是太阳系形成时残留的"建筑材料"。</p>
+          <div class="planet-grid">
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/10-ceres/10-ceres_01.jpg" alt="谷神星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>谷神星</h3>
+                <div class="planet-en">Ceres</div>
+                <p>小行星带中最大的天体，已被列为矮行星</p>
+                <span class="planet-stat">直径940km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/11-asteroid/11-asteroid_01.jpg" alt="灶神星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>灶神星</h3>
+                <div class="planet-en">Vesta</div>
+                <p>小行星带中质量第二大的天体</p>
+                <span class="planet-stat">直径525km</span>
+              </div>
+            </div>
+            <div class="planet-card fade-in-up visible">
+              <img src="images/explore/10-ceres/10-ceres_01.jpg" alt="小行星" loading="lazy">
+              <div class="planet-card-body">
+                <h3>小行星采样</h3>
+                <div class="planet-en">Asteroid Sample</div>
+                <p>人类的探测器已成功从小行星上采集样本返回地球</p>
+                <span class="planet-stat">探测任务</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== 视频播放区 ======== -->
+      <section class="video-section" id="video">
+        <div class="section-title fade-in-up">
+          <h2>🚀 星际探索影片</h2>
+          <p>跟随镜头，领略宇宙的震撼之美</p>
+          <div class="accent-line"></div>
+        </div>
+
+        <div class="video-wrapper fade-in-up">
+          <!-- 使用外链 NASA 公共领域视频（via Pexels / Coverr） -->
+          <video id="explore-video" preload="metadata" playsinline
+            poster="images/explore/03-solar-corona/03-solar-corona_01.jpg">
+            <source src="https://videos.pexels.com/video-files/854259/854259-hd_1920_1080_25fps.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+          </video>
+
+          <div class="video-controls">
+            <button id="video-play-btn" aria-label="播放">▶</button>
+
+            <div class="video-progress" id="video-progress">
+              <div class="video-progress-fill" id="video-progress-fill"></div>
+            </div>
+
+            <span class="video-time" id="video-time">0:00 / 0:00</span>
+
+            <label for="video-volume" style="color:#8890b0;font-size:0.8rem;">🔊</label>
+            <input type="range" id="video-volume" class="video-volume" min="0" max="1" step="0.05" value="0.5">
+          </div>
+        </div>
+        <p class="video-notice">* 视频来源：Pexels 免费太空素材</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- ======== 页脚 ======== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>✦ 星际<span>探索</span></h3>
+          <p>一个专注于宇宙科普与太空探索的静态展示站点。带你领略宇宙的壮美与神秘。</p>
+        </div>
+        <div class="footer-links">
+          <h4>探索</h4>
+          <a href="explore.html">太阳系</a>
+          <a href="gallery.html">太空画廊</a>
+          <a href="news.html">航天资讯</a>
+        </div>
+        <div class="footer-links">
+          <h4>关于</h4>
+          <a href="login.html">登录 / 注册</a>
+          <a href="#">隐私政策</a>
+          <a href="#">联系我们</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        Copyright &copy; 2026 星际探索. All rights reserved.<br>
+        阿不杜热合曼·努尔麦麦提 &nbsp;|&nbsp; 20254105119
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部 -->
+  <button id="back-to-top" class="back-to-top" aria-label="返回顶部">↑</button>
+
+  <!-- JavaScript -->
+  <script src="js/search.js"></script>
+  <script src="js/stars.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/explore.js"></script>
+</body>
+</html>

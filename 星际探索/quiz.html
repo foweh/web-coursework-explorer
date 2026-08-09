@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>宇宙知识测验 — 星际探索</title>
+  <meta name="description" content="测试你的天文知识水平，10 道宇宙知识选择题等你来挑战">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== 测验页专属样式 ===== */
+    .page-banner .quiz-icon {
+      font-size: 3rem;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 页面加载动画 -->
+  <div class="page-loader" id="page-loader">
+    <span class="loader-rocket">🚀</span>
+    <div class="loader-text">加载中<span class="loader-dots"></span></div>
+  </div>
+
+  <!-- 阅读进度条 -->
+  <div class="reading-progress" id="reading-progress"></div>
+
+  <!-- 星空背景 -->
+  <div class="stars-bg"></div>
+
+  <!-- ======== 网站头部 ======== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-img">✦</div>
+        <span class="logo-text">星际<span>探索</span></span>
+      </a>
+
+      <button class="hamburger" aria-label="切换菜单">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="main-nav">
+        <li><a href="index.html">首页</a></li>
+        <li class="has-dropdown">
+          <a href="explore.html">探索 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="explore.html">太阳系</a></li>
+            <li><a href="explore.html#planets">行星</a></li>
+            <li><a href="explore.html#video">星际视频</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="gallery.html">画廊 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="gallery.html">星云</a></li>
+            <li><a href="gallery.html">星系</a></li>
+            <li><a href="gallery.html">天文摄影</a></li>
+          </ul>
+        </li>
+        <li><a href="news.html">资讯</a></li>
+        <li><a href="quiz.html" class="active">测验</a></li>
+      </ul>
+
+      <div class="quick-nav">
+        <button class="search-btn" id="search-btn" aria-label="搜索">🔍</button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">🌙</button>
+        <a href="login.html">登录</a>
+        <a href="login.html?register" class="btn-login">注册</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======== 页面横幅 ======== -->
+  <section class="page-banner">
+    <div class="container">
+      <div class="quiz-icon">🧠</div>
+      <h1>宇宙知识测验</h1>
+      <p>10 道天文选择题，看看你能答对多少？</p>
+    </div>
+  </section>
+
+  <!-- ======== 测验主体 ======== -->
+  <main class="page-main">
+    <div class="container">
+      <div class="quiz-page">
+        <div class="quiz-box" id="quiz">
+
+          <div class="quiz-header">
+            <h2>🌌 星际挑战</h2>
+            <p>每道题选择你认为正确的答案</p>
+          </div>
+
+          <!-- 进度条 -->
+          <div class="quiz-progress" id="quiz-progress"></div>
+
+          <!-- 题目 -->
+          <div class="quiz-question" id="quiz-question"></div>
+
+          <!-- 选项 -->
+          <div class="quiz-options" id="quiz-options"></div>
+
+          <!-- 结果（隐藏） -->
+          <div class="quiz-result" id="quiz-result" style="display:none;"></div>
+
+          <!-- 底部 -->
+          <div class="quiz-footer" id="quiz-footer">
+            <span class="quiz-counter" id="quiz-counter">0 / 10</span>
+            <button class="btn btn-primary" id="quiz-next" style="display:none;">下一题 →</button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======== 页脚 ======== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>✦ 星际<span>探索</span></h3>
+          <p>一个专注于宇宙科普与太空探索的静态展示站点。带你领略宇宙的壮美与神秘。</p>
+        </div>
+        <div class="footer-links">
+          <h4>探索</h4>
+          <a href="explore.html">太阳系</a>
+          <a href="gallery.html">太空画廊</a>
+          <a href="news.html">航天资讯</a>
+        </div>
+        <div class="footer-links">
+          <h4>关于</h4>
+          <a href="login.html">登录 / 注册</a>
+          <a href="#">隐私政策</a>
+          <a href="#">联系我们</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        Copyright &copy; 2026 星际探索. All rights reserved.<br>
+        阿不杜热合曼·努尔麦麦提 &nbsp;|&nbsp; 20254105119
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部 -->
+  <button id="back-to-top" class="back-to-top" aria-label="返回顶部">↑</button>
+
+  <!-- JavaScript -->
+  <script src="js/search.js"></script>
+  <script src="js/stars.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/quiz.js"></script>
+</body>
+</html>

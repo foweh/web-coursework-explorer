@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>航天资讯 — 星际探索</title>
+  <meta name="description" content="最新航天新闻、天文发现与太空探索动态">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== 资讯页样式 ===== */
+
+    /* 资讯 Tab */
+    .news-tabs {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    .news-panel {
+      display: none;
+    }
+    .news-panel.active {
+      display: block;
+    }
+
+    /* 资讯列表 */
+    .news-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .news-card {
+      display: flex;
+      gap: 20px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+    .news-card:hover {
+      transform: translateX(6px);
+      border-color: rgba(0, 212, 255, 0.25);
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+    }
+    .news-card img {
+      width: 220px;
+      min-height: 160px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .news-card-body {
+      padding: 18px 20px 18px 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .news-card-body .news-date {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+    }
+    .news-card-body .news-tag {
+      display: inline-block;
+      padding: 1px 10px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+      background: var(--accent-cyan-dim);
+      color: var(--accent-cyan);
+      margin-bottom: 6px;
+      align-self: flex-start;
+    }
+    .news-card-body h3 {
+      font-size: 1.08rem;
+      margin-bottom: 6px;
+    }
+    .news-card-body p {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* --- 倒计时板块 --- */
+    .countdown-section {
+      max-width: 960px;
+      margin: 50px auto 0;
+      padding: 30px 32px;
+      background: linear-gradient(135deg, rgba(240,192,64,0.08), rgba(0,212,255,0.08));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      text-align: center;
+    }
+    .countdown-section h3 {
+      font-size: 1.15rem;
+      margin-bottom: 4px;
+    }
+    .countdown-section .countdown-sub {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+    }
+    .countdown-timer {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: 4px;
+      background: linear-gradient(135deg, var(--accent-gold), var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .countdown-label {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .news-card {
+        flex-direction: column;
+      }
+      .news-card img {
+        width: 100%;
+        height: 180px;
+      }
+      .news-card-body {
+        padding: 0 16px 16px;
+      }
+      .countdown-timer {
+        font-size: 1.5rem;
+        letter-spacing: 2px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 页面加载动画 -->
+  <div class="page-loader" id="page-loader">
+    <span class="loader-rocket">🚀</span>
+    <div class="loader-text">加载中<span class="loader-dots"></span></div>
+  </div>
+  <!-- 阅读进度条 -->
+  <div class="reading-progress" id="reading-progress"></div>
+  <!-- 星空背景 -->
+  <div class="stars-bg"></div>
+
+  <!-- ======== 网站头部 ======== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-img">✦</div>
+        <span class="logo-text">星际<span>探索</span></span>
+      </a>
+
+      <button class="hamburger" aria-label="切换菜单">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="main-nav">
+        <li><a href="index.html">首页</a></li>
+        <li class="has-dropdown">
+          <a href="explore.html">探索 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="explore.html">太阳系</a></li>
+            <li><a href="explore.html#planets">行星</a></li>
+            <li><a href="explore.html#video">星际视频</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="gallery.html">画廊 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="gallery.html">星云</a></li>
+            <li><a href="gallery.html">星系</a></li>
+            <li><a href="gallery.html">天文摄影</a></li>
+          </ul>
+        </li>
+        <li><a href="news.html" class="active">资讯</a></li>
+        <li><a href="quiz.html">测验</a></li>
+      </ul>
+
+      <div class="quick-nav">
+        <button class="search-btn" id="search-btn" aria-label="搜索">🔍</button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">🌙</button>
+        <a href="login.html">登录</a>
+        <a href="login.html?register" class="btn-login">注册</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======== 页面横幅 ======== -->
+  <section class="page-banner">
+    <div class="container">
+      <h1>航天资讯</h1>
+      <p>追踪航天动态，发现宇宙新知</p>
+    </div>
+  </section>
+
+  <!-- ======== 主体 ======== -->
+  <main class="page-main">
+    <div class="container">
+
+      <!-- Tab 切换 -->
+      <div class="tabs news-tabs">
+        <div class="tab-nav">
+          <button class="tab-btn news-tab-btn active" data-target="news-latest">🔥 最新</button>
+          <button class="tab-btn news-tab-btn" data-target="news-mission">🚀 发射任务</button>
+          <button class="tab-btn news-tab-btn" data-target="news-discover">🔭 天文发现</button>
+        </div>
+
+        <!-- 最新资讯 -->
+        <div class="tab-panel news-panel active" id="news-latest">
+          <div class="news-list">
+            <article class="news-card fade-in-up visible">
+              <img src="images/hero/03-nebula/03-nebula_01.jpg" alt="韦伯望远镜" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年12月</span>
+                <span class="news-tag">最新</span>
+                <h3>韦伯望远镜发现早期星系</h3>
+                <p>詹姆斯·韦伯太空望远镜在宇宙早期发现了出乎意料的大质量星系，挑战了现有的星系形成理论。</p>
+              </div>
+            </article>
+
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/02-mars-water/02-mars-water_01.jpg" alt="火星" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年11月</span>
+                <span class="news-tag">最新</span>
+                <h3>火星地下发现液态水湖</h3>
+                <p>科学研究团队在火星南极冰盖下方发现大型液态水湖，为寻找地外生命提供了新线索。</p>
+              </div>
+            </article>
+
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/03-fast/03-fast_01.jpg" alt="恒星" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年10月</span>
+                <span class="news-tag">最新</span>
+                <h3>中国天眼发现新脉冲星</h3>
+                <p>FAST射电望远镜在银河系中发现多颗新的毫秒脉冲星，对引力波研究具有重要意义。</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- 发射任务 -->
+        <div class="tab-panel news-panel" id="news-mission">
+          <div class="news-list">
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/04-spacex/04-spacex_01.jpg" alt="火箭发射" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2026年1月</span>
+                <span class="news-tag">发射</span>
+                <h3>SpaceX星舰第五飞试射</h3>
+                <p>星舰组合体即将进行第五次轨道飞行测试，首次尝试"筷子"式捕获回收超级重型助推器。</p>
+              </div>
+            </article>
+
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/05-long-march/05-long-march_01.jpg" alt="长征火箭" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年12月</span>
+                <span class="news-tag">发射</span>
+                <h3>长征十二号首飞成功</h3>
+                <p>中国新一代运载火箭长征十二号在海南商业航天发射场成功首飞，将多颗卫星送入轨道。</p>
+              </div>
+            </article>
+
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/06-artemis/06-artemis_01.jpg" alt="阿尔忒弥斯" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年9月</span>
+                <span class="news-tag">发射</span>
+                <h3>阿尔忒弥斯三号筹备推进</h3>
+                <p>NASA阿尔忒弥斯登月计划持续推进，目标在本年代末实现宇航员再次登陆月球。</p>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- 天文发现 -->
+        <div class="tab-panel news-panel" id="news-discover">
+          <div class="news-list">
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/07-exoplanet/07-exoplanet_01.jpg" alt="系外行星" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年11月</span>
+                <span class="news-tag">发现</span>
+                <h3>发现宜居带超级地球</h3>
+                <p>天文学家在距地球约40光年的恒星系统中发现一颗位于宜居带的超级地球，可能拥有液态水。</p>
+              </div>
+            </article>
+
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/08-dark-matter/08-dark-matter_01.jpg" alt="暗物质" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年8月</span>
+                <span class="news-tag">发现</span>
+                <h3>暗物质分布图绘制完成</h3>
+                <p>国际团队利用引力透镜效应绘制出目前最精确的宇宙暗物质三维分布图。</p>
+              </div>
+            </article>
+
+            <article class="news-card fade-in-up visible">
+              <img src="images/news/09-jupiter-moons/09-jupiter-moons_01.jpg" alt="木星" loading="lazy">
+              <div class="news-card-body">
+                <span class="news-date">2025年7月</span>
+                <span class="news-tag">发现</span>
+                <h3>木星卫星数量更新</h3>
+                <p>天文学家宣布新发现12颗木星卫星，使木星已知卫星总数达到95颗，居太阳系之首。</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </div>
+
+      <!-- ======== 倒计时 ======== -->
+      <div class="countdown-section fade-in-up">
+        <h3>⏳ 下次重大航天事件倒计时</h3>
+        <p class="countdown-sub">2026年1月1日 — 新征程的起点</p>
+        <div class="countdown-timer" id="countdown-timer">计算中...</div>
+        <p class="countdown-label">目标：2026年1月1日 00:00 (北京时间)</p>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ======== 页脚 ======== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>✦ 星际<span>探索</span></h3>
+          <p>一个专注于宇宙科普与太空探索的静态展示站点。带你领略宇宙的壮美与神秘。</p>
+        </div>
+        <div class="footer-links">
+          <h4>探索</h4>
+          <a href="explore.html">太阳系</a>
+          <a href="gallery.html">太空画廊</a>
+          <a href="news.html">航天资讯</a>
+        </div>
+        <div class="footer-links">
+          <h4>关于</h4>
+          <a href="login.html">登录 / 注册</a>
+          <a href="#">隐私政策</a>
+          <a href="#">联系我们</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        Copyright &copy; 2026 星际探索. All rights reserved.<br>
+        阿不杜热合曼·努尔麦麦提 &nbsp;|&nbsp; 20254105119
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部 -->
+  <button id="back-to-top" class="back-to-top" aria-label="返回顶部">↑</button>
+
+  <!-- JavaScript -->
+  <script src="js/search.js"></script>
+  <script src="js/stars.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/news.js"></script>
+</body>
+</html>

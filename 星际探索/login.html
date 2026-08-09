@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 / 注册 — 星际探索</title>
+  <meta name="description" content="登录或注册星际探索账号，开启你的宇宙之旅">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* ===== 登录 / 注册页样式 ===== */
+
+    .auth-page {
+      min-height: calc(100vh - 68px - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 24px;
+    }
+    .auth-box {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(15, 20, 50, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 40px 36px 36px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+    .auth-box .auth-icon {
+      text-align: center;
+      font-size: 2.6rem;
+      margin-bottom: 6px;
+    }
+    .auth-box h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 4px;
+    }
+    .auth-box .subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    /* Tab 切换 */
+    .auth-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--glass-border);
+      margin-bottom: 28px;
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 12px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .auth-tab-btn:hover { color: var(--text-secondary); }
+    .auth-tab-btn.active {
+      color: var(--accent-gold);
+      border-bottom-color: var(--accent-gold);
+    }
+
+    /* 面板切换 */
+    .auth-panel {
+      display: none;
+      animation: tabFade 0.35s ease;
+    }
+    .auth-panel.active { display: block; }
+
+    /* 表单 */
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      font-family: inherit;
+      transition: var(--transition);
+      outline: none;
+    }
+    .form-group input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.15);
+    }
+    .form-group input.error {
+      border-color: #ff4757;
+      box-shadow: 0 0 0 3px rgba(255,71,87,0.15);
+    }
+    .form-group input::placeholder {
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+    .form-error {
+      display: none;
+      color: #ff4757;
+      font-size: 0.8rem;
+      margin-top: 4px;
+    }
+    .form-submit {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      background: linear-gradient(135deg, var(--accent-gold), #e6a800);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    .form-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 25px rgba(240,192,64,0.35);
+    }
+    .form-submit:active {
+      transform: translateY(0);
+    }
+
+    /* 反馈提示 */
+    .form-feedback {
+      display: none;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    .form-feedback.success {
+      display: block;
+      background: rgba(46,213,115,0.15);
+      color: #2ed573;
+      border: 1px solid rgba(46,213,115,0.3);
+    }
+    .form-feedback.error {
+      display: block;
+      background: rgba(255,71,87,0.15);
+      color: #ff4757;
+      border: 1px solid rgba(255,71,87,0.3);
+    }
+
+    .auth-footer-text {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .auth-footer-text a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+    .auth-footer-text a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 500px) {
+      .auth-box {
+        padding: 28px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 页面加载动画 -->
+  <div class="page-loader" id="page-loader">
+    <span class="loader-rocket">🚀</span>
+    <div class="loader-text">加载中<span class="loader-dots"></span></div>
+  </div>
+  <!-- 阅读进度条 -->
+  <div class="reading-progress" id="reading-progress"></div>
+  <!-- 星空背景 -->
+  <div class="stars-bg"></div>
+
+  <!-- ======== 网站头部 ======== -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <div class="logo-img">✦</div>
+        <span class="logo-text">星际<span>探索</span></span>
+      </a>
+
+      <button class="hamburger" aria-label="切换菜单">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="main-nav">
+        <li><a href="index.html">首页</a></li>
+        <li class="has-dropdown">
+          <a href="explore.html">探索 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="explore.html">太阳系</a></li>
+            <li><a href="explore.html#planets">行星</a></li>
+            <li><a href="explore.html#video">星际视频</a></li>
+          </ul>
+        </li>
+        <li class="has-dropdown">
+          <a href="gallery.html">画廊 <span class="dropdown-arrow">▾</span></a>
+          <ul class="dropdown-menu">
+            <li><a href="gallery.html">星云</a></li>
+            <li><a href="gallery.html">星系</a></li>
+            <li><a href="gallery.html">天文摄影</a></li>
+          </ul>
+        </li>
+        <li><a href="news.html">资讯</a></li>
+        <li><a href="quiz.html">测验</a></li>
+      </ul>
+
+      <div class="quick-nav">
+        <button class="search-btn" id="search-btn" aria-label="搜索">🔍</button>
+        <button class="theme-toggle" id="theme-toggle" aria-label="切换主题">🌙</button>
+        <a href="login.html" class="active">登录</a>
+        <a href="login.html?register" class="btn-login">注册</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ======== 登录/注册主体 ======== -->
+  <main class="auth-page">
+    <div class="auth-box">
+      <div class="auth-icon">🚀</div>
+      <h1>星际探索</h1>
+      <p class="subtitle">登录或注册，开启宇宙之旅</p>
+
+      <!-- Tab 切换 -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" data-tab="login">登录</button>
+        <button class="auth-tab-btn" data-tab="register">注册</button>
+      </div>
+
+      <!-- ====== 登录面板 ====== -->
+      <div class="auth-panel active" id="login-panel">
+        <form id="login-form" novalidate>
+          <div id="login-feedback" class="form-feedback"></div>
+
+          <div class="form-group">
+            <label for="login-email">邮箱</label>
+            <input type="email" id="login-email" placeholder="请输入邮箱地址" autocomplete="email">
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="login-password">密码</label>
+            <input type="password" id="login-password" placeholder="请输入密码" autocomplete="current-password">
+            <div class="form-error"></div>
+          </div>
+
+          <button type="submit" class="form-submit">登 录</button>
+        </form>
+        <p class="auth-footer-text">
+          还没有账号？<a href="#" id="switch-to-reg">立即注册</a>
+        </p>
+      </div>
+
+      <!-- ====== 注册面板 ====== -->
+      <div class="auth-panel" id="register-panel">
+        <form id="register-form" novalidate>
+          <div id="register-feedback" class="form-feedback"></div>
+
+          <div class="form-group">
+            <label for="reg-username">用户名</label>
+            <input type="text" id="reg-username" placeholder="2-20个字符" autocomplete="username">
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-email">邮箱</label>
+            <input type="email" id="reg-email" placeholder="请输入邮箱地址" autocomplete="email">
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-password">密码</label>
+            <input type="password" id="reg-password" placeholder="至少6位字符" autocomplete="new-password">
+            <div class="form-error"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="reg-confirm">确认密码</label>
+            <input type="password" id="reg-confirm" placeholder="再次输入密码" autocomplete="new-password">
+            <div class="form-error"></div>
+          </div>
+
+          <button type="submit" class="form-submit">注 册</button>
+        </form>
+        <p class="auth-footer-text">
+          已有账号？<a href="#" id="switch-to-login">立即登录</a>
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- ======== 页脚 ======== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>✦ 星际<span>探索</span></h3>
+          <p>一个专注于宇宙科普与太空探索的静态展示站点。带你领略宇宙的壮美与神秘。</p>
+        </div>
+        <div class="footer-links">
+          <h4>探索</h4>
+          <a href="explore.html">太阳系</a>
+          <a href="gallery.html">太空画廊</a>
+          <a href="news.html">航天资讯</a>
+        </div>
+        <div class="footer-links">
+          <h4>关于</h4>
+          <a href="login.html">登录 / 注册</a>
+          <a href="#">隐私政策</a>
+          <a href="#">联系我们</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        Copyright &copy; 2026 星际探索. All rights reserved.<br>
+        阿不杜热合曼·努尔麦麦提 &nbsp;|&nbsp; 20254105119
+      </div>
+    </div>
+  </footer>
+
+  <!-- 返回顶部 -->
+  <button id="back-to-top" class="back-to-top" aria-label="返回顶部">↑</button>
+
+  <!-- JavaScript -->
+  <script src="js/search.js"></script>
+  <script src="js/stars.js"></script>
+  <script src="js/main.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>
